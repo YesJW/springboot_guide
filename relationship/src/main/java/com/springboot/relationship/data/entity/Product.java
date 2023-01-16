@@ -1,9 +1,8 @@
-package com.springboot.advanced_jpa.data.entity;
+package com.springboot.relationship.data.entity;
 
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
