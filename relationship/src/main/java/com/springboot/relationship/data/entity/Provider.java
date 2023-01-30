@@ -3,6 +3,9 @@ package com.springboot.relationship.data.entity;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @Setter
@@ -10,17 +13,16 @@ import javax.persistence.*;
 @AllArgsConstructor
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-@Table(name = "product_detail")
-public class ProductDetail extends BaseEntity {
+@Table(name = "provider")
+public class Provider extends BaseEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-
     private Long id;
 
-    private String description;
+    private String name;
 
-    @OneToOne
-    @JoinColumn(name = "product_number")
-    private Product product;
+    @OneToMany(mappedBy = "provider", fetch = FetchType.EAGER)
+    @ToString.Exclude
+    private List<Product> productList = new ArrayList<>();
 }
