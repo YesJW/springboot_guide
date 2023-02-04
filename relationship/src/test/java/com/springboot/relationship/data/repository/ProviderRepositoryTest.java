@@ -2,9 +2,11 @@ package com.springboot.relationship.data.repository;
 
 import com.springboot.relationship.data.entity.Product;
 import com.springboot.relationship.data.entity.Provider;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -78,4 +80,67 @@ public class ProviderRepositoryTest {
 
 
     }
+
+    @Test
+    void cascadeTest() {
+        Provider provider = saveProvider("새로운 공급업체");
+
+        Product p1 = saveProduct("상품1", 1000, 1000);
+        Product p2 = saveProduct("상품2", 500, 1500);
+        Product p3 = saveProduct("상품3", 750, 500);
+
+        //연관관계 설정
+        p1.setProvider(provider);
+        p2.setProvider(provider);
+        p3.setProvider(provider);
+
+        provider.getProductList().addAll(Lists.newArrayList(p1, p2, p3));
+
+        providerRepository.save(provider);
+    }
+
+    private Product saveProduct(String name, int price, int stock) {
+
+        Product product = new Product();
+        product.setName(name);
+        product.setPrice(price);
+        product.setStock(stock);
+        return product;
+    }
+
+    private Provider saveProvider(String name) {
+        Provider provider = new Provider();
+        provider.setName(name);
+
+        return provider;
+    }
+
+    @Test
+    @Transactional
+    void orphanRemovalTest(){
+
+        Provider provider = saveProvider("새로운 공급업체");
+
+        Product p1 = saveProduct("상품1", 1000, 1000);
+        Product p2 = saveProduct("상품2", 500, 1500);
+        Product p3 = saveProduct("상품3", 750, 500);
+
+        //연관관계 설정
+        p1.setProvider(provider);
+        p2.setProvider(provider);
+        p3.setProvider(provider);
+
+        provider.getProductList().addAll(Lists.newArrayList(p1, p2, p3));
+
+        providerRepository.saveAndFlush(provider);
+        providerRepository.findAll().forEach(System.out::println);
+        productRepository.findAll().forEach(System.out::println);
+
+        Provider foundProvider = providerRepository.findById(1L).get();
+        foundProvider.getProductList().remove(0);
+
+        providerRepository.findAll().forEach(System.out::println);
+        productRepository.findAll().forEach(System.out::println);
+    }
+
 }
